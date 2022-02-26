@@ -118,8 +118,12 @@ def convert_db(source_path, destination_path):
 def start_server(database_path):
     app = Flask('__main__')
 
+    @app.route('/')
+    def index_view():
+        return '<a href="/A706813">A706813</a> или <a href="/A687769">A687769</a> и т.п.'
+
     @app.route('/<index>')
-    def index_view(index):
+    def record_view(index):
         with sqlite3.connect(database_path) as database:
             database.row_factory = sqlite3.Row
             cursor = database.cursor()
