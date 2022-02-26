@@ -139,21 +139,21 @@ def start_server(database_path):
                     C1.name AS primary_color,
                     C2.name AS secondary_color
                 FROM
-                    animals,
-                    animal_types,
-                    outcome_types,
-                    outcome_subtypes,
-                    breeds
+                    animals
+                    JOIN animal_types
+                        ON animals.animal_type = animal_types.id
+                    JOIN outcome_types
+                        ON animals.outcome_type = outcome_types.id
+                    JOIN outcome_subtypes
+                        ON animals.outcome_subtype = outcome_subtypes.id
+                    JOIN breeds
+                        ON animals.breed = breeds.id
                     JOIN colors AS C1
                         ON animals.primary_color = C1.id
                     JOIN colors AS C2
                         ON animals.secondary_color = C2.id
                 WHERE
                     animals.id="{index}"
-                    AND animals.animal_type = animal_types.id
-                    AND animals.outcome_type = outcome_types.id
-                    AND animals.outcome_subtype = outcome_subtypes.id
-                    AND animals.breed = breeds.id
             """
             cursor.execute(query)
 
