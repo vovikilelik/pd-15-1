@@ -37,7 +37,6 @@ CREATE TABLE IF NOT EXISTS "animals" (
 	"id" 			TEXT,
 	"name"			TEXT,
 	"date_of_birth"		DATE,
-	"age_upon_outcome"	TEXT,
 	"animal_type"		TINYINT,
 	"breed"			SMALLINT,
 	"primary_color"		SMALLINT,

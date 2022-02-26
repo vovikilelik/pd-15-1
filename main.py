@@ -1,8 +1,10 @@
 import sys
 import os
 import sqlite3
-from flask import Flask
 import json
+import datetime
+
+from flask import Flask
 
 SQL_PATH = './res/create-db.sql'  # Путь к файлу со схемой базы данных
 SOURCE_DB_PATH = './res/animal.db'  # Путь конвертируемой базы
@@ -47,9 +49,8 @@ def push_row(destination, row):
     # Обычные записи
     name = row['name']
     date_of_birth = row['date_of_birth']
-    age_upon_outcome = row['age_upon_outcome']
     animal_id = row['animal_id']
-    outcome_date = f'{row["outcome_year"]}-{str(row["outcome_month"]).rjust(2, "0")}-00'
+    outcome_date = f'{row["outcome_year"]}-{str(row["outcome_month"]).rjust(2, "0")}-01'
 
     # Делаем новую запись
     cursor = destination.cursor()
@@ -63,7 +64,6 @@ def push_row(destination, row):
             breed,
             name,
             date_of_birth,
-            age_upon_outcome,
             id,
             outcome_date
         ) VALUES (
@@ -75,7 +75,6 @@ def push_row(destination, row):
             {breed_id},
             {text_or_null(name)},
             "{date_of_birth}",
-            "{age_upon_outcome}",
             "{animal_id}",
             "{outcome_date}"
         )
@@ -129,7 +128,6 @@ def start_server(database_path):
                 SELECT
                     animals.name,
                     animals.date_of_birth,
-                    animals.age_upon_outcome,
                     animals.id,
                     animals.outcome_date,
                     animal_types.name AS animal_type,
@@ -157,7 +155,17 @@ def start_server(database_path):
             """
             cursor.execute(query)
 
-            return json.dumps(dict(cursor.fetchone()))
+            row = cursor.fetchone()
+            if not row:
+                return 'Ничего е найдено'
+
+            # Считаем age_upon_outcome
+            date_of_birth = datetime.datetime.fromisoformat(row['date_of_birth'])
+            outcome_date = datetime.datetime.fromisoformat(row['outcome_date'])
+
+            age_upon_outcome = outcome_date - date_of_birth
+
+            return json.dumps({**dict(row), 'age_upon_outcome': f'{round(age_upon_outcome.days / 30)} months'})
 
     app.run(debug=True)
 
